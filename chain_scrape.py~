@@ -1,0 +1,26 @@
+import grequests
+import lxml.html
+
+#set up
+
+base_url = "view-source:http://www.yelp.com/search?find_desc=chain+restaurants&find_loc=New+York%2C+NY#"
+
+#iterate
+
+urls =[]
+for i in xrange(10,110,10):
+    urls.append(base_url+"start="+str(i))
+
+rs = (grequests.get(u) for u in urls)
+
+#grab
+responses = grequests.map(rs)
+
+all_links = []
+for r in responses:
+    html = lxml.html.fromstring(r.text)
+    links = html.xpath("//a/@href")
+    biz_links = [link for link in links if "biz" in link]
+    all_links += biz_links
+
+print all_links
